@@ -1,4 +1,4 @@
-package gods
+package stack
 
 import (
 	"sync"
