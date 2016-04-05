@@ -9,12 +9,13 @@ type node interface{}
 type Stack struct {
 	count int
 	data  []node
-	mutex sync.Mutex
+	mutex *sync.Mutex
 }
 
 func NewStack() *Stack {
 	return &Stack{
 		count: 0,
+		mutex: new(sync.Mutex),
 	}
 }
 

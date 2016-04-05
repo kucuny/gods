@@ -24,7 +24,7 @@ func (n *Node) GetValue() interface{} {
 type LinkedList struct {
 	head, tail *Node
 	count      int
-	mutex      sync.Mutex
+	mutex      *sync.Mutex
 }
 
 func NewLinkedList() *LinkedList {
@@ -38,6 +38,7 @@ func NewLinkedList() *LinkedList {
 		head:  head,
 		tail:  tail,
 		count: 0,
+		mutex: new(sync.Mutex),
 	}
 }
 

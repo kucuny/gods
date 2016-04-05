@@ -9,12 +9,13 @@ type node interface{}
 type Queue struct {
 	count int
 	data  []node
-	mutex sync.Mutex
+	mutex *sync.Mutex
 }
 
 func NewQueue() *Queue {
 	return &Queue{
 		count: 0,
+		mutex: new(sync.Mutex),
 	}
 }
 
