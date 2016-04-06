@@ -3,7 +3,6 @@ package tree
 import (
 	"github.com/stretchr/testify/suite"
 	"testing"
-	"fmt"
 )
 
 type BinarySearchTreeTestSuite struct {
@@ -11,11 +10,11 @@ type BinarySearchTreeTestSuite struct {
 	bst *BinarySearchTree
 }
 
-func (suite *BinarySearchTreeTestSuite) SetupSuite() {
+func (suite *BinarySearchTreeTestSuite) SetupTest() {
 	suite.bst = NewBinarySearchTree(IntegerComparer)
 }
 
-func (suite *BinarySearchTreeTestSuite) TestBinarySearchTree() {
+func (suite *BinarySearchTreeTestSuite) TestBinarySearchTreeBasic() {
 	suite.Equal(0, suite.bst.Len())
 
 	suite.bst.Insert(10)
@@ -30,10 +29,93 @@ func (suite *BinarySearchTreeTestSuite) TestBinarySearchTree() {
 	suite.Equal(10, suite.bst.root.value)
 	suite.Equal(15, suite.bst.root.right.value)
 	suite.Equal(5, suite.bst.root.left.value)
+}
 
-	runner := func(value interface{}) { fmt.Println(value) }
+func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeTraversePreOrderGetResult() {
+	suite.bst.Insert(20)
+	suite.bst.Insert(6)
+	suite.bst.Insert(7)
+	suite.bst.Insert(35)
+	suite.bst.Insert(10)
+	suite.bst.Insert(25)
+	suite.bst.Insert(8)
 
-	suite.bst.TraverseLevelOrder(runner)
+	suite.Equal(7, suite.bst.Len())
+
+	runner := func(value interface{}) { }
+
+	resultChan := make(chan interface{})
+	var result []interface{}
+	go suite.bst.TraversePreOrderResult(runner, resultChan)
+
+	for r := range resultChan {
+		result = append(result, r)
+	}
+
+	suite.Equal([]interface{}{20, 6, 7, 10, 8, 35, 25}, result)
+}
+
+func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeTraverseInOrderGetResult() {
+	suite.bst.Insert(10)
+	suite.bst.Insert(4)
+	suite.bst.Insert(20)
+	suite.bst.Insert(7)
+	suite.bst.Insert(15)
+	suite.bst.Insert(5)
+
+	suite.Equal(6, suite.bst.Len())
+
+	runner := func(value interface{}) { }
+	resultChan := make(chan interface{})
+	var result []interface{}
+	go suite.bst.TraverseInOrderResult(runner, resultChan)
+
+	for r := range resultChan {
+		result = append(result, r)
+	}
+
+	suite.Equal([]interface{}{4, 5, 7, 10, 15, 20}, result)
+}
+
+func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeTraversePostOrderGetResult() {
+	suite.bst.Insert(12)
+	suite.bst.Insert(1)
+	suite.bst.Insert(7)
+	suite.bst.Insert(20)
+	suite.bst.Insert(4)
+
+	suite.Equal(5, suite.bst.Len())
+
+	runner := func(value interface{}) { }
+	resultChan := make(chan interface{})
+	var result []interface{}
+	go suite.bst.TraversePostOrderResult(runner, resultChan)
+
+	for r := range resultChan {
+		result = append(result, r)
+	}
+
+	suite.Equal([]interface{}{4, 7, 1, 20, 12}, result)
+}
+
+func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeTraverseLevelOrderGetResult() {
+	suite.bst.Insert(10)
+	suite.bst.Insert(15)
+	suite.bst.Insert(5)
+	suite.bst.Insert(3)
+
+	suite.Equal(4, suite.bst.Len())
+
+	runner := func(value interface{}) { }
+	resultChan := make(chan interface{})
+	var result []interface{}
+	go suite.bst.TraverseLevelOrderResult(runner, resultChan)
+
+	for r := range resultChan {
+		result = append(result, r)
+	}
+
+	suite.Equal([]interface{}{10, 5, 15, 3}, result)
 }
 
 func TestBinarySearchTreeTestSuite(t *testing.T) {
