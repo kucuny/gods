@@ -1,12 +1,12 @@
 package tree
 
 import (
-	"fmt"
 	"github.com/kucuny/gods/queue"
 	"sync"
 )
 
 type Comparer func(value1, value2 interface{}) bool
+type Runner func(value interface{})
 
 func IntegerComparer(value1, value2 interface{}) bool {
 	return value1.(int) > value2.(int)
@@ -100,53 +100,61 @@ func (b *BinarySearchTree) Insert(value interface{}) bool {
 	return isSuccess
 }
 
-func (b *BinarySearchTree) TraversePreOrder() {
-	b.preOrder(b.root)
+func (b *BinarySearchTree) TraversePreOrder(runner Runner) {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+	b.preOrder(b.root, runner)
 }
 
-func (b *BinarySearchTree) TraversePostOrder() {
-	b.postOrder(b.root)
+func (b *BinarySearchTree) TraversePostOrder(runner Runner) {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+	b.postOrder(b.root, runner)
 }
 
-func (b *BinarySearchTree) TraverseInOrder() {
-	b.inOrder(b.root)
+func (b *BinarySearchTree) TraverseInOrder(runner Runner) {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+	b.inOrder(b.root, runner)
 }
 
-func (b *BinarySearchTree) TraverseLevelOrder() {
-	b.levelOrder(b.root)
+func (b *BinarySearchTree) TraverseLevelOrder(runner Runner) {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+	b.levelOrder(b.root, runner)
 }
 
-func (b *BinarySearchTree) preOrder(node *Node) {
+func (b *BinarySearchTree) preOrder(node *Node, runner Runner) {
 	if node == nil {
 		return
 	}
 
-	fmt.Println(node.value)
-	b.preOrder(node.left)
-	b.preOrder(node.right)
+	runner(node.value)
+	b.preOrder(node.left, runner)
+	b.preOrder(node.right, runner)
 }
 
-func (b *BinarySearchTree) postOrder(node *Node) {
+func (b *BinarySearchTree) postOrder(node *Node, runner Runner) {
 	if node == nil {
 		return
 	}
 
-	b.postOrder(node.left)
-	b.postOrder(node.right)
-	fmt.Println(node.value)
+	b.postOrder(node.left, runner)
+	b.postOrder(node.right, runner)
+	runner(node.value)
 }
 
-func (b *BinarySearchTree) inOrder(node *Node) {
+func (b *BinarySearchTree) inOrder(node *Node, runner Runner) {
 	if node == nil {
 		return
 	}
 
-	b.inOrder(node.left)
-	fmt.Println(node.value)
-	b.inOrder(node.right)
+	b.inOrder(node.left, runner)
+	runner(node.value)
+	b.inOrder(node.right, runner)
 }
 
-func (b *BinarySearchTree) levelOrder(node *Node) {
+func (b *BinarySearchTree) levelOrder(node *Node, runner Runner) {
 	if node == nil {
 		return
 	}
@@ -154,20 +162,17 @@ func (b *BinarySearchTree) levelOrder(node *Node) {
 	q := queue.NewQueue()
 	q.Push(node)
 
-	fmt.Println(q.Len())
-
 	for q.Len() > 0 {
-		n := q.Pop()
-		e := n.(*Node)
+		n := (*Node)(q.Pop().(*Node))
 
-		fmt.Println(e.value)
+		runner(n.value)
 
-		if node.left != nil {
-			q.Push(node.left)
+		if n.left != nil {
+			q.Push(n.left)
 		}
 
-		if node.right != nil {
-			q.Push(node.right)
+		if n.right != nil {
+			q.Push(n.right)
 		}
 	}
 }

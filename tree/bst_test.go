@@ -3,6 +3,7 @@ package tree
 import (
 	"github.com/stretchr/testify/suite"
 	"testing"
+	"fmt"
 )
 
 type BinarySearchTreeTestSuite struct {
@@ -29,6 +30,10 @@ func (suite *BinarySearchTreeTestSuite) TestBinarySearchTree() {
 	suite.Equal(10, suite.bst.root.value)
 	suite.Equal(15, suite.bst.root.right.value)
 	suite.Equal(5, suite.bst.root.left.value)
+
+	runner := func(value interface{}) { fmt.Println(value) }
+
+	suite.bst.TraverseLevelOrder(runner)
 }
 
 func TestBinarySearchTreeTestSuite(t *testing.T) {
