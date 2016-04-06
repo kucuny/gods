@@ -5,23 +5,23 @@ import (
 	"sync"
 )
 
-type Comparer func(value1, value2 interface{}) bool
+type Comparer func(source, target interface{}) bool
 type Runner func(value interface{})
 
-func IntegerComparer(value1, value2 interface{}) bool {
-	return value1.(int) > value2.(int)
+func IntegerComparer(source, target interface{}) bool {
+	return source.(int) > target.(int)
 }
 
-func Integer64Comparer(value1, value2 interface{}) bool {
-	return value1.(int64) > value2.(int64)
+func Integer64Comparer(source, target interface{}) bool {
+	return source.(int64) > target.(int64)
 }
 
-func Float32Comparer(value1, value2 interface{}) bool {
-	return value1.(float32) > value2.(float32)
+func Float32Comparer(source, target interface{}) bool {
+	return source.(float32) > target.(float32)
 }
 
-func Float64Comparer(value1, value2 interface{}) bool {
-	return value1.(float64) > value2.(float64)
+func Float64Comparer(source, target interface{}) bool {
+	return source.(float64) > target.(float64)
 }
 
 type Node struct {
@@ -98,6 +98,33 @@ func (b *BinarySearchTree) Insert(value interface{}) bool {
 	}
 
 	return isSuccess
+}
+
+func (b *BinarySearchTree) Search(value interface{}) *Node {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+
+	if b.root == nil {
+		return nil
+	}
+
+	return b.search(b.root, value)
+}
+
+func (b *BinarySearchTree) search(node *Node, value interface{}) *Node {
+	if node == nil {
+		return nil
+	}
+
+	if node.value == value {
+		return node
+	}
+
+	if b.comparer(node.value, value) {
+		return b.search(node.left, value)
+	} else {
+		return b.search(node.right, value)
+	}
 }
 
 func (b *BinarySearchTree) TraversePreOrder(runner Runner) {
