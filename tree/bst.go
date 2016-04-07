@@ -6,7 +6,7 @@ import (
 )
 
 type Comparer func(source, target interface{}) bool
-type Runner func(value interface{})
+type Runner func(value *Node)
 
 func IntegerComparer(source, target interface{}) bool {
 	return source.(int) > target.(int)
@@ -56,30 +56,6 @@ func (b *BinarySearchTree) Len() int {
 	return b.count
 }
 
-func (b *BinarySearchTree) insert(node *Node, value interface{}) bool {
-	if node == nil {
-		return false
-	}
-
-	if b.comparer(node.value, value) {
-		if node.left == nil {
-			node.left = &Node{value: value}
-			return true
-		} else {
-			return b.insert(node.left, value)
-		}
-	} else if !b.comparer(node.value, value) {
-		if node.right == nil {
-			node.right = &Node{value: value}
-			return true
-		} else {
-			return b.insert(node.right, value)
-		}
-	}
-
-	return false
-}
-
 func (b *BinarySearchTree) Insert(value interface{}) bool {
 	b.mutex.Lock()
 	defer b.mutex.Unlock()
@@ -109,22 +85,6 @@ func (b *BinarySearchTree) Search(value interface{}) *Node {
 	}
 
 	return b.search(b.root, value)
-}
-
-func (b *BinarySearchTree) search(node *Node, value interface{}) *Node {
-	if node == nil {
-		return nil
-	}
-
-	if node.value == value {
-		return node
-	}
-
-	if b.comparer(node.value, value) {
-		return b.search(node.left, value)
-	} else {
-		return b.search(node.right, value)
-	}
 }
 
 func (b *BinarySearchTree) TraversePreOrder(runner Runner) {
@@ -179,12 +139,74 @@ func (b *BinarySearchTree) TraverseLevelOrderResult(runner Runner, resultChan ch
 	close(resultChan)
 }
 
+func (b *BinarySearchTree) Min() interface{} {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+
+	if b.root == nil {
+		return nil
+	}
+
+	return b.min(b.root)
+}
+
+func (b *BinarySearchTree) Max() interface{} {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+
+	if b.root == nil {
+		return nil
+	}
+
+	return b.max(b.root)
+}
+
+func (b *BinarySearchTree) insert(node *Node, value interface{}) bool {
+	if node == nil {
+		return false
+	}
+
+	if b.comparer(node.value, value) {
+		if node.left == nil {
+			node.left = &Node{value: value}
+			return true
+		} else {
+			return b.insert(node.left, value)
+		}
+	} else if !b.comparer(node.value, value) {
+		if node.right == nil {
+			node.right = &Node{value: value}
+			return true
+		} else {
+			return b.insert(node.right, value)
+		}
+	}
+
+	return false
+}
+
+func (b *BinarySearchTree) search(node *Node, value interface{}) *Node {
+	if node == nil {
+		return nil
+	}
+
+	if node.value == value {
+		return node
+	}
+
+	if b.comparer(node.value, value) {
+		return b.search(node.left, value)
+	} else {
+		return b.search(node.right, value)
+	}
+}
+
 func (b *BinarySearchTree) preOrder(node *Node, runner Runner) {
 	if node == nil {
 		return
 	}
 
-	runner(node.value)
+	runner(node)
 	b.preOrder(node.left, runner)
 	b.preOrder(node.right, runner)
 }
@@ -195,7 +217,7 @@ func (b *BinarySearchTree) preOrderResult(node *Node, runner Runner, resultChan 
 	}
 
 	resultChan <- node.value
-	runner(node.value)
+	runner(node)
 	b.preOrderResult(node.left, runner, resultChan)
 	b.preOrderResult(node.right, runner, resultChan)
 }
@@ -207,7 +229,7 @@ func (b *BinarySearchTree) postOrder(node *Node, runner Runner) {
 
 	b.postOrder(node.left, runner)
 	b.postOrder(node.right, runner)
-	runner(node.value)
+	runner(node)
 }
 
 func (b *BinarySearchTree) postOrderResult(node *Node, runner Runner, resultChan chan interface{}) {
@@ -218,7 +240,7 @@ func (b *BinarySearchTree) postOrderResult(node *Node, runner Runner, resultChan
 	b.postOrderResult(node.left, runner, resultChan)
 	b.postOrderResult(node.right, runner, resultChan)
 	resultChan <- node.value
-	runner(node.value)
+	runner(node)
 }
 
 func (b *BinarySearchTree) inOrder(node *Node, runner Runner) {
@@ -227,7 +249,7 @@ func (b *BinarySearchTree) inOrder(node *Node, runner Runner) {
 	}
 
 	b.inOrder(node.left, runner)
-	runner(node.value)
+	runner(node)
 	b.inOrder(node.right, runner)
 }
 
@@ -238,7 +260,7 @@ func (b *BinarySearchTree) inOrderResult(node *Node, runner Runner, resultChan c
 
 	b.inOrderResult(node.left, runner, resultChan)
 	resultChan <- node.value
-	runner(node.value)
+	runner(node)
 	b.inOrderResult(node.right, runner, resultChan)
 }
 
@@ -253,7 +275,7 @@ func (b *BinarySearchTree) levelOrder(node *Node, runner Runner) {
 	for q.Len() > 0 {
 		n := (*Node)(q.Pop().(*Node))
 
-		runner(n.value)
+		runner(n)
 
 		if n.left != nil {
 			q.Push(n.left)
@@ -277,7 +299,7 @@ func (b *BinarySearchTree) levelOrderResult(node *Node, runner Runner, resultCha
 		n := (*Node)(q.Pop().(*Node))
 
 		resultChan <- n.value
-		runner(n.value)
+		runner(n)
 
 		if n.left != nil {
 			q.Push(n.left)
@@ -287,4 +309,20 @@ func (b *BinarySearchTree) levelOrderResult(node *Node, runner Runner, resultCha
 			q.Push(n.right)
 		}
 	}
+}
+
+func (b *BinarySearchTree) min(node *Node) interface{} {
+	if node.left == nil {
+		return node.value
+	}
+
+	return b.min(node.left)
+}
+
+func (b *BinarySearchTree) max(node *Node) interface{} {
+	if node.right == nil {
+		return node.value
+	}
+
+	return b.min(node.right)
 }
