@@ -183,6 +183,53 @@ func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeGetMaxValueIsNotExis
 	suite.Nil(minValue)
 }
 
+func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeGetFindMinValueIsExist() {
+	suite.bst.Insert(10)
+	suite.bst.Insert(15)
+	suite.bst.Insert(7)
+	suite.bst.Insert(40)
+	suite.bst.Insert(5)
+	suite.bst.Insert(3)
+	suite.bst.Insert(6)
+	suite.bst.Insert(12)
+	suite.bst.Insert(11)
+	suite.bst.Insert(13)
+	suite.bst.Insert(22)
+	suite.bst.Insert(45)
+	suite.bst.Insert(20)
+	suite.bst.Insert(24)
+
+	suite.Equal(14, suite.bst.Len())
+
+	searchedNode := suite.bst.Search(40)
+	minValue := suite.bst.FindMin(searchedNode)
+	suite.Equal(20, minValue)
+}
+
+func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeGetFindMaxValueIsExist() {
+	suite.bst.Insert(10)
+	suite.bst.Insert(15)
+	suite.bst.Insert(7)
+	suite.bst.Insert(40)
+	suite.bst.Insert(5)
+	suite.bst.Insert(3)
+	suite.bst.Insert(6)
+	suite.bst.Insert(12)
+	suite.bst.Insert(11)
+	suite.bst.Insert(13)
+	suite.bst.Insert(22)
+	suite.bst.Insert(45)
+	suite.bst.Insert(20)
+	suite.bst.Insert(24)
+
+	suite.Equal(14, suite.bst.Len())
+
+	searchedNode := suite.bst.Search(15)
+
+	minValue := suite.bst.FindMax(searchedNode)
+	suite.Equal(45, minValue)
+}
+
 func TestBinarySearchTreeTestSuite(t *testing.T) {
 	suite.Run(t, new(BinarySearchTreeTestSuite))
 }

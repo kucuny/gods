@@ -161,6 +161,28 @@ func (b *BinarySearchTree) Max() interface{} {
 	return b.max(b.root)
 }
 
+func (b *BinarySearchTree) FindMin(node *Node) interface{} {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+
+	if b.root == nil {
+		return nil
+	}
+
+	return b.min(node)
+}
+
+func (b *BinarySearchTree) FindMax(node *Node) interface{} {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+
+	if b.root == nil {
+		return nil
+	}
+
+	return b.max(node)
+}
+
 func (b *BinarySearchTree) insert(node *Node, value interface{}) bool {
 	if node == nil {
 		return false
@@ -324,5 +346,5 @@ func (b *BinarySearchTree) max(node *Node) interface{} {
 		return node.value
 	}
 
-	return b.min(node.right)
+	return b.max(node.right)
 }
