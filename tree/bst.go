@@ -26,11 +26,11 @@ func Float64Comparer(source, target interface{}) bool {
 
 type Node struct {
 	left, right *Node
-	value       interface{}
+	Value       interface{}
 }
 
 func NewNode(value interface{}) *Node {
-	return &Node{value: value}
+	return &Node{Value: value}
 }
 
 type BinarySearchTree struct {
@@ -63,7 +63,7 @@ func (b *BinarySearchTree) Insert(value interface{}) bool {
 	var isSuccess bool = false
 
 	if b.root == nil {
-		b.root = &Node{value: value}
+		b.root = &Node{Value: value}
 		isSuccess = true
 	} else {
 		isSuccess = b.insert(b.root, value)
@@ -139,7 +139,7 @@ func (b *BinarySearchTree) TraverseLevelOrderResult(runner Runner, resultChan ch
 	close(resultChan)
 }
 
-func (b *BinarySearchTree) Min() interface{} {
+func (b *BinarySearchTree) Min() *Node {
 	b.mutex.Lock()
 	defer b.mutex.Unlock()
 
@@ -150,7 +150,7 @@ func (b *BinarySearchTree) Min() interface{} {
 	return b.min(b.root)
 }
 
-func (b *BinarySearchTree) Max() interface{} {
+func (b *BinarySearchTree) Max() *Node {
 	b.mutex.Lock()
 	defer b.mutex.Unlock()
 
@@ -161,7 +161,7 @@ func (b *BinarySearchTree) Max() interface{} {
 	return b.max(b.root)
 }
 
-func (b *BinarySearchTree) FindMin(node *Node) interface{} {
+func (b *BinarySearchTree) FindMin(node *Node) *Node {
 	b.mutex.Lock()
 	defer b.mutex.Unlock()
 
@@ -172,7 +172,7 @@ func (b *BinarySearchTree) FindMin(node *Node) interface{} {
 	return b.min(node)
 }
 
-func (b *BinarySearchTree) FindMax(node *Node) interface{} {
+func (b *BinarySearchTree) FindMax(node *Node) *Node {
 	b.mutex.Lock()
 	defer b.mutex.Unlock()
 
@@ -188,16 +188,16 @@ func (b *BinarySearchTree) insert(node *Node, value interface{}) bool {
 		return false
 	}
 
-	if b.comparer(node.value, value) {
+	if b.comparer(node.Value, value) {
 		if node.left == nil {
-			node.left = &Node{value: value}
+			node.left = &Node{Value: value}
 			return true
 		} else {
 			return b.insert(node.left, value)
 		}
-	} else if !b.comparer(node.value, value) {
+	} else if !b.comparer(node.Value, value) {
 		if node.right == nil {
-			node.right = &Node{value: value}
+			node.right = &Node{Value: value}
 			return true
 		} else {
 			return b.insert(node.right, value)
@@ -212,11 +212,11 @@ func (b *BinarySearchTree) search(node *Node, value interface{}) *Node {
 		return nil
 	}
 
-	if node.value == value {
+	if node.Value == value {
 		return node
 	}
 
-	if b.comparer(node.value, value) {
+	if b.comparer(node.Value, value) {
 		return b.search(node.left, value)
 	} else {
 		return b.search(node.right, value)
@@ -238,7 +238,7 @@ func (b *BinarySearchTree) preOrderResult(node *Node, runner Runner, resultChan 
 		return
 	}
 
-	resultChan <- node.value
+	resultChan <- node.Value
 	runner(node)
 	b.preOrderResult(node.left, runner, resultChan)
 	b.preOrderResult(node.right, runner, resultChan)
@@ -261,7 +261,7 @@ func (b *BinarySearchTree) postOrderResult(node *Node, runner Runner, resultChan
 
 	b.postOrderResult(node.left, runner, resultChan)
 	b.postOrderResult(node.right, runner, resultChan)
-	resultChan <- node.value
+	resultChan <- node.Value
 	runner(node)
 }
 
@@ -281,7 +281,7 @@ func (b *BinarySearchTree) inOrderResult(node *Node, runner Runner, resultChan c
 	}
 
 	b.inOrderResult(node.left, runner, resultChan)
-	resultChan <- node.value
+	resultChan <- node.Value
 	runner(node)
 	b.inOrderResult(node.right, runner, resultChan)
 }
@@ -320,7 +320,7 @@ func (b *BinarySearchTree) levelOrderResult(node *Node, runner Runner, resultCha
 	for q.Len() > 0 {
 		n := (*Node)(q.Pop().(*Node))
 
-		resultChan <- n.value
+		resultChan <- n.Value
 		runner(n)
 
 		if n.left != nil {
@@ -333,17 +333,17 @@ func (b *BinarySearchTree) levelOrderResult(node *Node, runner Runner, resultCha
 	}
 }
 
-func (b *BinarySearchTree) min(node *Node) interface{} {
+func (b *BinarySearchTree) min(node *Node) *Node {
 	if node.left == nil {
-		return node.value
+		return node
 	}
 
 	return b.min(node.left)
 }
 
-func (b *BinarySearchTree) max(node *Node) interface{} {
+func (b *BinarySearchTree) max(node *Node) *Node {
 	if node.right == nil {
-		return node.value
+		return node
 	}
 
 	return b.max(node.right)
