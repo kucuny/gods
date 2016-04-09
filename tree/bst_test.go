@@ -7,46 +7,52 @@ import (
 
 type BinarySearchTreeTestSuite struct {
 	suite.Suite
-	bst *BinarySearchTree
+	bstInt     *BinarySearchTree
+	bstInt64   *BinarySearchTree
+	bstFloat32 *BinarySearchTree
+	bstFloat64 *BinarySearchTree
 }
 
 func (suite *BinarySearchTreeTestSuite) SetupTest() {
-	suite.bst = NewBinarySearchTree(IntegerComparer)
+	suite.bstInt = NewBinarySearchTree(IntegerComparer)
+	suite.bstInt64 = NewBinarySearchTree(Integer64Comparer)
+	suite.bstFloat32 = NewBinarySearchTree(Float32Comparer)
+	suite.bstFloat64 = NewBinarySearchTree(Float64Comparer)
 }
 
-func (suite *BinarySearchTreeTestSuite) TestBinarySearchTreeBasic() {
-	suite.Equal(0, suite.bst.Len())
+func (suite *BinarySearchTreeTestSuite) TestBinarySearchTreeInt() {
+	suite.Equal(0, suite.bstInt.Len())
 
-	suite.bst.Insert(10)
-	suite.Equal(1, suite.bst.Len())
+	suite.bstInt.Insert(10)
+	suite.Equal(1, suite.bstInt.Len())
 
-	suite.bst.Insert(15)
-	suite.Equal(2, suite.bst.Len())
+	suite.bstInt.Insert(15)
+	suite.Equal(2, suite.bstInt.Len())
 
-	suite.bst.Insert(5)
-	suite.Equal(3, suite.bst.Len())
+	suite.bstInt.Insert(5)
+	suite.Equal(3, suite.bstInt.Len())
 
-	suite.Equal(10, suite.bst.root.Value)
-	suite.Equal(15, suite.bst.root.right.Value)
-	suite.Equal(5, suite.bst.root.left.Value)
+	suite.Equal(10, suite.bstInt.root.Value)
+	suite.Equal(15, suite.bstInt.root.right.Value)
+	suite.Equal(5, suite.bstInt.root.left.Value)
 }
 
-func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeTraversePreOrderGetResult() {
-	suite.bst.Insert(20)
-	suite.bst.Insert(6)
-	suite.bst.Insert(7)
-	suite.bst.Insert(35)
-	suite.bst.Insert(10)
-	suite.bst.Insert(25)
-	suite.bst.Insert(8)
+func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeIntTraversePreOrderGetResult() {
+	suite.bstInt.Insert(20)
+	suite.bstInt.Insert(6)
+	suite.bstInt.Insert(7)
+	suite.bstInt.Insert(35)
+	suite.bstInt.Insert(10)
+	suite.bstInt.Insert(25)
+	suite.bstInt.Insert(8)
 
-	suite.Equal(7, suite.bst.Len())
+	suite.Equal(7, suite.bstInt.Len())
 
 	runner := func(value *Node) {}
 
 	resultChan := make(chan interface{})
 	var result []interface{}
-	go suite.bst.TraversePreOrderResult(runner, resultChan)
+	go suite.bstInt.TraversePreOrderResult(runner, resultChan)
 
 	for r := range resultChan {
 		result = append(result, r)
@@ -55,20 +61,20 @@ func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeTraversePreOrderGetR
 	suite.Equal([]interface{}{20, 6, 7, 10, 8, 35, 25}, result)
 }
 
-func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeTraverseInOrderGetResult() {
-	suite.bst.Insert(10)
-	suite.bst.Insert(4)
-	suite.bst.Insert(20)
-	suite.bst.Insert(7)
-	suite.bst.Insert(15)
-	suite.bst.Insert(5)
+func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeIntTraverseInOrderGetResult() {
+	suite.bstInt.Insert(10)
+	suite.bstInt.Insert(4)
+	suite.bstInt.Insert(20)
+	suite.bstInt.Insert(7)
+	suite.bstInt.Insert(15)
+	suite.bstInt.Insert(5)
 
-	suite.Equal(6, suite.bst.Len())
+	suite.Equal(6, suite.bstInt.Len())
 
 	runner := func(value *Node) {}
 	resultChan := make(chan interface{})
 	var result []interface{}
-	go suite.bst.TraverseInOrderResult(runner, resultChan)
+	go suite.bstInt.TraverseInOrderResult(runner, resultChan)
 
 	for r := range resultChan {
 		result = append(result, r)
@@ -77,19 +83,19 @@ func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeTraverseInOrderGetRe
 	suite.Equal([]interface{}{4, 5, 7, 10, 15, 20}, result)
 }
 
-func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeTraversePostOrderGetResult() {
-	suite.bst.Insert(12)
-	suite.bst.Insert(1)
-	suite.bst.Insert(7)
-	suite.bst.Insert(20)
-	suite.bst.Insert(4)
+func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeIntTraversePostOrderGetResult() {
+	suite.bstInt.Insert(12)
+	suite.bstInt.Insert(1)
+	suite.bstInt.Insert(7)
+	suite.bstInt.Insert(20)
+	suite.bstInt.Insert(4)
 
-	suite.Equal(5, suite.bst.Len())
+	suite.Equal(5, suite.bstInt.Len())
 
 	runner := func(value *Node) {}
 	resultChan := make(chan interface{})
 	var result []interface{}
-	go suite.bst.TraversePostOrderResult(runner, resultChan)
+	go suite.bstInt.TraversePostOrderResult(runner, resultChan)
 
 	for r := range resultChan {
 		result = append(result, r)
@@ -98,18 +104,18 @@ func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeTraversePostOrderGet
 	suite.Equal([]interface{}{4, 7, 1, 20, 12}, result)
 }
 
-func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeTraverseLevelOrderGetResult() {
-	suite.bst.Insert(10)
-	suite.bst.Insert(15)
-	suite.bst.Insert(5)
-	suite.bst.Insert(3)
+func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeIntTraverseLevelOrderGetResult() {
+	suite.bstInt.Insert(10)
+	suite.bstInt.Insert(15)
+	suite.bstInt.Insert(5)
+	suite.bstInt.Insert(3)
 
-	suite.Equal(4, suite.bst.Len())
+	suite.Equal(4, suite.bstInt.Len())
 
 	runner := func(value *Node) {}
 	resultChan := make(chan interface{})
 	var result []interface{}
-	go suite.bst.TraverseLevelOrderResult(runner, resultChan)
+	go suite.bstInt.TraverseLevelOrderResult(runner, resultChan)
 
 	for r := range resultChan {
 		result = append(result, r)
@@ -118,117 +124,140 @@ func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeTraverseLevelOrderGe
 	suite.Equal([]interface{}{10, 5, 15, 3}, result)
 }
 
-func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeSearchSuccess() {
-	suite.bst.Insert(10)
-	suite.bst.Insert(15)
-	suite.bst.Insert(5)
-	suite.bst.Insert(3)
+func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeIntSearchSuccess() {
+	suite.bstInt.Insert(10)
+	suite.bstInt.Insert(15)
+	suite.bstInt.Insert(5)
+	suite.bstInt.Insert(3)
 
-	suite.Equal(4, suite.bst.Len())
+	suite.Equal(4, suite.bstInt.Len())
 
-	searched := suite.bst.Search(10)
+	searched := suite.bstInt.Search(10)
 	suite.Equal(10, searched.Value)
 
-	searched = suite.bst.Search(3)
+	searched = suite.bstInt.Search(3)
 	suite.Equal(3, searched.Value)
 }
 
-func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeSearchFailure() {
-	suite.bst.Insert(10)
-	suite.bst.Insert(15)
-	suite.bst.Insert(5)
-	suite.bst.Insert(3)
+func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeIntSearchFailure() {
+	suite.bstInt.Insert(10)
+	suite.bstInt.Insert(15)
+	suite.bstInt.Insert(5)
+	suite.bstInt.Insert(3)
 
-	suite.Equal(4, suite.bst.Len())
+	suite.Equal(4, suite.bstInt.Len())
 
-	searched := suite.bst.Search(100)
+	searched := suite.bstInt.Search(100)
 	suite.Nil(searched)
 }
 
-func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeGetMinValueIsExist() {
-	suite.bst.Insert(10)
-	suite.bst.Insert(15)
-	suite.bst.Insert(5)
-	suite.bst.Insert(3)
+func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeIntGetMinValueIsExist() {
+	suite.bstInt.Insert(10)
+	suite.bstInt.Insert(15)
+	suite.bstInt.Insert(5)
+	suite.bstInt.Insert(3)
 
-	suite.Equal(4, suite.bst.Len())
+	suite.Equal(4, suite.bstInt.Len())
 
-	minValue := suite.bst.Min()
+	minValue := suite.bstInt.Min()
 	suite.Equal(3, minValue.Value)
 }
 
-func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeGetMinValueIsNotExist() {
-	suite.Equal(0, suite.bst.Len())
+func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeIntGetMinValueIsNotExist() {
+	suite.Equal(0, suite.bstInt.Len())
 
-	minValue := suite.bst.Min()
+	minValue := suite.bstInt.Min()
 	suite.Nil(minValue)
 }
 
-func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeGetMaxValueIsExist() {
-	suite.bst.Insert(10)
-	suite.bst.Insert(15)
-	suite.bst.Insert(5)
-	suite.bst.Insert(3)
+func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeIntGetMaxValueIsExist() {
+	suite.bstInt.Insert(10)
+	suite.bstInt.Insert(15)
+	suite.bstInt.Insert(5)
+	suite.bstInt.Insert(3)
 
-	suite.Equal(4, suite.bst.Len())
+	suite.Equal(4, suite.bstInt.Len())
 
-	minValue := suite.bst.Max()
+	minValue := suite.bstInt.Max()
 	suite.Equal(15, minValue.Value)
 }
 
-func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeGetMaxValueIsNotExist() {
-	suite.Equal(0, suite.bst.Len())
+func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeIntGetMaxValueIsNotExist() {
+	suite.Equal(0, suite.bstInt.Len())
 
-	minValue := suite.bst.Max()
+	minValue := suite.bstInt.Max()
 	suite.Nil(minValue)
 }
 
-func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeGetFindMinValueIsExist() {
-	suite.bst.Insert(10)
-	suite.bst.Insert(15)
-	suite.bst.Insert(7)
-	suite.bst.Insert(40)
-	suite.bst.Insert(5)
-	suite.bst.Insert(3)
-	suite.bst.Insert(6)
-	suite.bst.Insert(12)
-	suite.bst.Insert(11)
-	suite.bst.Insert(13)
-	suite.bst.Insert(22)
-	suite.bst.Insert(45)
-	suite.bst.Insert(20)
-	suite.bst.Insert(24)
+func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeIntGetFindMinValueIsExist() {
+	suite.bstInt.Insert(10)
+	suite.bstInt.Insert(15)
+	suite.bstInt.Insert(7)
+	suite.bstInt.Insert(40)
+	suite.bstInt.Insert(5)
+	suite.bstInt.Insert(3)
+	suite.bstInt.Insert(6)
+	suite.bstInt.Insert(12)
+	suite.bstInt.Insert(11)
+	suite.bstInt.Insert(13)
+	suite.bstInt.Insert(22)
+	suite.bstInt.Insert(45)
+	suite.bstInt.Insert(20)
+	suite.bstInt.Insert(24)
 
-	suite.Equal(14, suite.bst.Len())
+	suite.Equal(14, suite.bstInt.Len())
 
-	searchedNode := suite.bst.Search(40)
-	minValue := suite.bst.FindMin(searchedNode)
+	searchedNode := suite.bstInt.Search(40)
+	minValue := suite.bstInt.FindMin(searchedNode)
 	suite.Equal(20, minValue.Value)
 }
 
-func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeGetFindMaxValueIsExist() {
-	suite.bst.Insert(10)
-	suite.bst.Insert(15)
-	suite.bst.Insert(7)
-	suite.bst.Insert(40)
-	suite.bst.Insert(5)
-	suite.bst.Insert(3)
-	suite.bst.Insert(6)
-	suite.bst.Insert(12)
-	suite.bst.Insert(11)
-	suite.bst.Insert(13)
-	suite.bst.Insert(22)
-	suite.bst.Insert(45)
-	suite.bst.Insert(20)
-	suite.bst.Insert(24)
+func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeIntGetFindMaxValueIsExist() {
+	suite.bstInt.Insert(10)
+	suite.bstInt.Insert(15)
+	suite.bstInt.Insert(7)
+	suite.bstInt.Insert(40)
+	suite.bstInt.Insert(5)
+	suite.bstInt.Insert(3)
+	suite.bstInt.Insert(6)
+	suite.bstInt.Insert(12)
+	suite.bstInt.Insert(11)
+	suite.bstInt.Insert(13)
+	suite.bstInt.Insert(22)
+	suite.bstInt.Insert(45)
+	suite.bstInt.Insert(20)
+	suite.bstInt.Insert(24)
 
-	suite.Equal(14, suite.bst.Len())
+	suite.Equal(14, suite.bstInt.Len())
 
-	searchedNode := suite.bst.Search(15)
+	searchedNode := suite.bstInt.Search(15)
 
-	minValue := suite.bst.FindMax(searchedNode)
+	minValue := suite.bstInt.FindMax(searchedNode)
 	suite.Equal(45, minValue.Value)
 }
+
+//func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeIntRemoveNodeIsSuccess() {
+//	suite.bstInt.Insert(10)
+//	suite.bstInt.Insert(15)
+//	suite.bstInt.Insert(7)
+//	suite.bstInt.Insert(40)
+//	suite.bstInt.Insert(5)
+//	suite.bstInt.Insert(3)
+//	suite.bstInt.Insert(6)
+//	suite.bstInt.Insert(12)
+//	suite.bstInt.Insert(11)
+//	suite.bstInt.Insert(13)
+//	suite.bstInt.Insert(22)
+//	suite.bstInt.Insert(45)
+//	suite.bstInt.Insert(20)
+//	suite.bstInt.Insert(24)
+//
+//	suite.Equal(14, suite.bstInt.Len())
+//
+//	suite.bstInt.Remove(3)
+//	suite.Equal(13, suite.bstInt.Len())
+//	suite.Equal(5, suite.bstInt.Min().Value)
+//}
 
 func TestBinarySearchTreeTestSuite(t *testing.T) {
 	suite.Run(t, new(BinarySearchTreeTestSuite))

@@ -5,23 +5,63 @@ import (
 	"sync"
 )
 
-type Comparer func(source, target interface{}) bool
+type ComparerType int
+
+const (
+	ComparerLarger = iota
+	ComparerSmaller
+	ComparerEqual
+)
+
+type Comparer func(source, target interface{}) ComparerType
 type Runner func(value *Node)
 
-func IntegerComparer(source, target interface{}) bool {
-	return source.(int) > target.(int)
+func IntegerComparer(source, target interface{}) ComparerType {
+	if source.(int) < target.(int) {
+		return ComparerLarger
+	}
+
+	if source.(int) > target.(int) {
+		return ComparerSmaller
+	}
+
+	return ComparerEqual
 }
 
-func Integer64Comparer(source, target interface{}) bool {
-	return source.(int64) > target.(int64)
+func Integer64Comparer(source, target interface{}) ComparerType {
+	if source.(int64) < target.(int64) {
+		return ComparerLarger
+	}
+
+	if source.(int64) > target.(int64) {
+		return ComparerSmaller
+	}
+
+	return ComparerEqual
 }
 
-func Float32Comparer(source, target interface{}) bool {
-	return source.(float32) > target.(float32)
+func Float32Comparer(source, target interface{}) ComparerType {
+	if source.(float32) < target.(float32) {
+		return ComparerLarger
+	}
+
+	if source.(float32) > target.(float32) {
+		return ComparerSmaller
+	}
+
+	return ComparerEqual
 }
 
-func Float64Comparer(source, target interface{}) bool {
-	return source.(float64) > target.(float64)
+func Float64Comparer(source, target interface{}) ComparerType {
+	if source.(float64) < target.(float64) {
+		return ComparerLarger
+	}
+
+	if source.(float64) > target.(float64) {
+		return ComparerSmaller
+	}
+
+	return ComparerEqual
 }
 
 type Node struct {
@@ -30,7 +70,7 @@ type Node struct {
 }
 
 func NewNode(value interface{}) *Node {
-	return &Node{Value: value}
+	return &Node{Value: value, left: nil, right: nil}
 }
 
 type BinarySearchTree struct {
@@ -63,7 +103,7 @@ func (b *BinarySearchTree) Insert(value interface{}) bool {
 	var isSuccess bool = false
 
 	if b.root == nil {
-		b.root = &Node{Value: value}
+		b.root = NewNode(value)
 		isSuccess = true
 	} else {
 		isSuccess = b.insert(b.root, value)
@@ -74,6 +114,15 @@ func (b *BinarySearchTree) Insert(value interface{}) bool {
 	}
 
 	return isSuccess
+}
+
+func (b *BinarySearchTree) Remove(value interface{}) *Node {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+
+	b.remove(b.root, value)
+	b.count--
+	return nil
 }
 
 func (b *BinarySearchTree) Search(value interface{}) *Node {
@@ -188,16 +237,16 @@ func (b *BinarySearchTree) insert(node *Node, value interface{}) bool {
 		return false
 	}
 
-	if b.comparer(node.Value, value) {
+	if b.comparer(node.Value, value) == ComparerSmaller {
 		if node.left == nil {
-			node.left = &Node{Value: value}
+			node.left = NewNode(value)
 			return true
 		} else {
 			return b.insert(node.left, value)
 		}
-	} else if !b.comparer(node.Value, value) {
+	} else if b.comparer(node.Value, value) == ComparerLarger {
 		if node.right == nil {
-			node.right = &Node{Value: value}
+			node.right = NewNode(value)
 			return true
 		} else {
 			return b.insert(node.right, value)
@@ -205,6 +254,29 @@ func (b *BinarySearchTree) insert(node *Node, value interface{}) bool {
 	}
 
 	return false
+}
+
+func (b *BinarySearchTree) remove(node *Node, removeValue interface{}) {
+	if node == nil {
+		node = nil
+		return
+	}
+
+	if b.comparer(node.Value, removeValue) == ComparerSmaller {
+		b.remove(node.left, removeValue)
+	} else if b.comparer(node.Value, removeValue) == ComparerLarger {
+		b.remove(node.right, removeValue)
+	} else if b.comparer(node.Value, removeValue) == ComparerEqual {
+		if node.left == nil && node.right == nil {
+			node = nil
+		} else if node.left != nil {
+			node = node.left
+		} else if node.right != nil {
+			node = node.right
+		} else {
+			node = nil
+		}
+	}
 }
 
 func (b *BinarySearchTree) search(node *Node, value interface{}) *Node {
@@ -216,10 +288,12 @@ func (b *BinarySearchTree) search(node *Node, value interface{}) *Node {
 		return node
 	}
 
-	if b.comparer(node.Value, value) {
+	if b.comparer(node.Value, value) == ComparerSmaller {
 		return b.search(node.left, value)
-	} else {
+	} else if b.comparer(node.Value, value) == ComparerLarger {
 		return b.search(node.right, value)
+	} else {
+		return node
 	}
 }
 
