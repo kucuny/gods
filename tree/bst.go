@@ -106,7 +106,13 @@ func (b *BinarySearchTree) Insert(value interface{}) bool {
 		b.root = NewNode(value)
 		isSuccess = true
 	} else {
-		isSuccess = b.insert(b.root, value)
+		node := b.insert(b.root, value)
+
+		if node != nil {
+			isSuccess = true
+		} else {
+			isSuccess = false
+		}
 	}
 
 	if isSuccess {
@@ -232,33 +238,24 @@ func (b *BinarySearchTree) FindMax(node *Node) *Node {
 	return b.max(node)
 }
 
-func (b *BinarySearchTree) insert(node *Node, value interface{}) bool {
+func (b *BinarySearchTree) insert(node *Node, value interface{}) *Node {
 	if node == nil {
-		return false
+		return NewNode(value)
 	}
 
 	if b.comparer(node.Value, value) == ComparerSmaller {
-		if node.left == nil {
-			node.left = NewNode(value)
-			return true
-		} else {
-			return b.insert(node.left, value)
-		}
+		node.left = b.insert(node.left, value)
+		return node
 	} else if b.comparer(node.Value, value) == ComparerLarger {
-		if node.right == nil {
-			node.right = NewNode(value)
-			return true
-		} else {
-			return b.insert(node.right, value)
-		}
+		node.right = b.insert(node.right, value)
+		return node
+	} else {
+		return nil
 	}
-
-	return false
 }
 
 func (b *BinarySearchTree) remove(node *Node, removeValue interface{}) {
 	if node == nil {
-		node = nil
 		return
 	}
 
@@ -270,13 +267,15 @@ func (b *BinarySearchTree) remove(node *Node, removeValue interface{}) {
 		if node.left == nil && node.right == nil {
 			node = nil
 		} else if node.left != nil {
-			node = node.left
+			*node = *node.left
 		} else if node.right != nil {
-			node = node.right
+			*node = *node.right
 		} else {
 			node = nil
 		}
 	}
+
+	return
 }
 
 func (b *BinarySearchTree) search(node *Node, value interface{}) *Node {

@@ -3,6 +3,7 @@ package tree
 import (
 	"github.com/stretchr/testify/suite"
 	"testing"
+	"fmt"
 )
 
 type BinarySearchTreeTestSuite struct {
@@ -236,28 +237,30 @@ func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeIntGetFindMaxValueIs
 	suite.Equal(45, minValue.Value)
 }
 
-//func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeIntRemoveNodeIsSuccess() {
-//	suite.bstInt.Insert(10)
-//	suite.bstInt.Insert(15)
-//	suite.bstInt.Insert(7)
-//	suite.bstInt.Insert(40)
-//	suite.bstInt.Insert(5)
-//	suite.bstInt.Insert(3)
-//	suite.bstInt.Insert(6)
-//	suite.bstInt.Insert(12)
-//	suite.bstInt.Insert(11)
-//	suite.bstInt.Insert(13)
-//	suite.bstInt.Insert(22)
-//	suite.bstInt.Insert(45)
-//	suite.bstInt.Insert(20)
-//	suite.bstInt.Insert(24)
-//
-//	suite.Equal(14, suite.bstInt.Len())
-//
-//	suite.bstInt.Remove(3)
-//	suite.Equal(13, suite.bstInt.Len())
-//	suite.Equal(5, suite.bstInt.Min().Value)
-//}
+func (suite *BinarySearchTreeTestSuite) TestBianrySearchTreeIntRemoveNodeIsSuccess() {
+	suite.bstInt.Insert(10)
+	suite.bstInt.Insert(15)
+	suite.bstInt.Insert(7)
+	suite.bstInt.Insert(40)
+	suite.bstInt.Insert(5)
+	suite.bstInt.Insert(3)
+	suite.bstInt.Insert(12)
+	suite.bstInt.Insert(11)
+	suite.bstInt.Insert(13)
+	suite.bstInt.Insert(22)
+	suite.bstInt.Insert(45)
+	suite.bstInt.Insert(20)
+	suite.bstInt.Insert(24)
+
+	suite.Equal(13, suite.bstInt.Len())
+
+	suite.bstInt.Remove(5)
+	suite.Equal(12, suite.bstInt.Len())
+	suite.Equal(3, suite.bstInt.Min().Value)
+
+	runner := func (node *Node) { fmt.Println(node.Value) }
+	suite.bstInt.TraverseInOrder(runner)
+}
 
 func TestBinarySearchTreeTestSuite(t *testing.T) {
 	suite.Run(t, new(BinarySearchTreeTestSuite))
